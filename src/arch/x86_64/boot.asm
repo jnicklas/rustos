@@ -12,6 +12,8 @@ start:
     call setup_page_tables
     call enable_paging
 
+    lgdt [gdt64.pointer]
+
     ; print `OK` to screen
     mov dword [0xb8000], 0x2f4b2f4f
     hlt
@@ -114,6 +116,16 @@ error:
     mov dword [0xb8008], 0x4f204f20
     mov byte  [0xb800a], al
     hlt
+
+section .rodata
+gdt64:
+    dq 0 ; zero entry
+    dq (1<<44) | (1<<47) | (1<<41) | (1<<43) | (1<<53) ; code segment
+    dq (1<<44) | (1<<47) | (1<<41) ; data segment
+
+.pointer:
+    dw $ - gdt64 - 1
+    dq gdt64
 
 section .bss
 align 4096
