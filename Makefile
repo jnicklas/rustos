@@ -32,7 +32,7 @@ cargo:
 		@cargo build --target $(target)
 
 $(kernel): cargo $(rustos) $(assembly_object_files) $(linker_script)
-		@ld -n -T $(linker_script) -o $(kernel) $(assembly_object_files) $(rustos)
+		@ld -n --gc-sections -T $(linker_script) -o $(kernel) $(assembly_object_files) $(rustos)
 
 # compile assembly files
 build/arch/$(arch)/%.o: src/arch/$(arch)/%.asm
