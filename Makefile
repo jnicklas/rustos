@@ -29,7 +29,7 @@ $(iso): $(kernel) $(grub_cfg)
 		@rm -r build/isofiles
 
 cargo:
-		@cargo build --target $(target)
+		@cargo rustc --target $(target) -- -Z no-landing-pads
 
 $(kernel): cargo $(rustos) $(assembly_object_files) $(linker_script)
 		@ld -n --gc-sections -T $(linker_script) -o $(kernel) $(assembly_object_files) $(rustos)
