@@ -1,6 +1,8 @@
 arch ?= x86_64
 kernel := build/kernel-$(arch).bin
 iso := build/os-$(arch).iso
+target ?= $(arch)-unknown-linux-gnu
+rustos := target/$(target)/debug/librustos.a
 
 linker_script := src/arch/$(arch)/linker.ld
 grub_cfg := src/arch/$(arch)/grub.cfg
@@ -14,7 +16,7 @@ all: $(kernel)
 clean:
 		@rm -r build
 
-run: $(iso)
+run:
 		@qemu-system-x86_64 -hda $(iso)
 
 iso: $(iso)
@@ -26,8 +28,11 @@ $(iso): $(kernel) $(grub_cfg)
 		@grub-mkrescue -o $(iso) build/isofiles 2> /dev/null
 		@rm -r build/isofiles
 
-$(kernel): $(assembly_object_files) $(linker_script)
-		@ld -n -T $(linker_script) -o $(kernel) $(assembly_object_files)
+cargo:
+		@cargo build --target $(target)
+
+$(kernel): cargo $(rustos) $(assembly_object_files) $(linker_script)
+		@ld -n -T $(linker_script) -o $(kernel) $(assembly_object_files) $(rustos)
 
 # compile assembly files
 build/arch/$(arch)/%.o: src/arch/$(arch)/%.asm

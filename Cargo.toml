@@ -1,0 +1,10 @@
+[package]
+name = "rustos"
+version = "0.1.0"
+authors = ["Jonas Nicklas <jonas@elabs.se>"]
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+rlibc = "*"
