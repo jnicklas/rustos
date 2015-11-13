@@ -1,4 +1,5 @@
 global start
+extern long_mode_start
 
 section .text
 bits 32
@@ -14,9 +15,12 @@ start:
 
     lgdt [gdt64.pointer]
 
-    ; print `OK` to screen
-    mov dword [0xb8000], 0x2f4b2f4f
-    hlt
+    mov ax, 16
+    mov ss, ax  ; stack selector
+    mov ds, ax  ; data selector
+    mov es, ax  ; extra selector
+
+    jmp gdt64.code:long_mode_start
 
 test_multiboot:
     cmp eax, 0x36d76289
@@ -120,7 +124,9 @@ error:
 section .rodata
 gdt64:
     dq 0 ; zero entry
+.code: equ $ - gdt64 ; new
     dq (1<<44) | (1<<47) | (1<<41) | (1<<43) | (1<<53) ; code segment
+.data: equ $ - gdt64 ; new
     dq (1<<44) | (1<<47) | (1<<41) ; data segment
 
 .pointer:
